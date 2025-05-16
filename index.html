@@ -119,7 +119,7 @@
     /* Username with Minecraft Head */
     .username-container {
       position: relative;
-      margin-bottom: 20px;
+      margin-bottom: 10px;
     }
 
     .minecraft-head {
@@ -137,6 +137,86 @@
 
     #username {
       padding-left: 50px !important;
+    }
+
+    /* Minecraft Edition Selector */
+    .edition-selector {
+      margin-bottom: 20px;
+      display: flex;
+      gap: 10px;
+    }
+
+    .edition-option {
+      flex: 1;
+      padding: 10px;
+      text-align: center;
+      border-radius: 5px;
+      background: rgba(255, 255, 255, 0.1);
+      cursor: pointer;
+      transition: all 0.3s ease;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .edition-option:hover {
+      background: rgba(255, 255, 255, 0.2);
+      transform: translateY(-2px);
+    }
+
+    .edition-option.selected {
+      background: rgba(0, 173, 181, 0.3);
+      border-color: rgba(0, 173, 181, 0.5);
+      box-shadow: 0 0 10px rgba(0, 173, 181, 0.3);
+    }
+
+    .edition-icon {
+      width: 24px;
+      height: 24px;
+      margin-bottom: 5px;
+      display: inline-block;
+      background-size: contain;
+      background-repeat: no-repeat;
+      background-position: center;
+      image-rendering: pixelated;
+    }
+
+    /* WhatsApp Number Selector */
+    .whatsapp-selector {
+      position: fixed;
+      bottom: 80px;
+      left: 20px;
+      background: rgba(0, 0, 0, 0.5);
+      padding: 10px;
+      border-radius: 5px;
+      backdrop-filter: blur(5px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      z-index: 100;
+      max-width: 200px;
+    }
+
+    .whatsapp-selector-title {
+      font-size: 12px;
+      margin-bottom: 5px;
+      opacity: 0.8;
+    }
+
+    .whatsapp-option {
+      padding: 6px 8px;
+      margin: 3px 0;
+      border-radius: 3px;
+      cursor: pointer;
+      transition: all 0.2s;
+      font-size: 12px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .whatsapp-option:hover {
+      background: rgba(255, 255, 255, 0.1);
+    }
+
+    .whatsapp-option.selected {
+      background: rgba(0, 173, 181, 0.3);
     }
 
     header {
@@ -186,7 +266,7 @@
       background: rgba(255,255,255,0.1);
       color: white;
       width: 100%;
-      margin-bottom: 20px;
+      margin-bottom: 10px;
       transition: all 0.3s ease;
       border: 1px solid rgba(255, 255, 255, 0.1);
     }
@@ -501,6 +581,18 @@
         <input type="text" id="username" required placeholder="Masukkan username Minecraft">
       </div>
 
+      <div class="edition-selector">
+        <div class="edition-option selected" data-edition="java">
+          <div class="edition-icon" style="background-image: url('https://www.minecraft.net/content/dam/minecraft/touchup-java/2020/game-icons/minecraft-block-icon.png');"></div>
+          <div>Java Edition</div>
+        </div>
+        <div class="edition-option" data-edition="bedrock">
+          <div class="edition-icon" style="background-image: url('https://www.minecraft.net/content/dam/minecraft/touchup-java/2020/game-icons/bedrock-block-icon.png');"></div>
+          <div>Bedrock Edition</div>
+        </div>
+      </div>
+      <input type="hidden" id="edition" name="edition" value="java">
+
       <label for="produk">Pilih Produk:</label>
       <div class="select-container">
         <select id="produk">
@@ -528,6 +620,17 @@
     <div class="alert" id="hasilTransaksi"></div>
   </section>
 
+  <!-- WhatsApp Number Selector -->
+  <div class="whatsapp-selector">
+    <div class="whatsapp-selector-title">Pilih Admin:</div>
+    <div class="whatsapp-option selected" data-number="6285720103106" data-name="Rizky">
+      Rizky +62 85720103106
+    </div>
+    <div class="whatsapp-option" data-number="6289507912442" data-name="Leazent">
+      Leazent +62 89507912442
+    </div>
+  </div>
+
   <footer>
     <p>&copy; 2025 TopUP SilenceSMP. All rights reserved.</p>
   </footer>
@@ -539,6 +642,8 @@
     const cancelBtn = document.getElementById('cancelBtn');
     const form = document.getElementById('formTopup');
     let formSubmitted = false;
+    let currentWhatsAppNumber = '6285720103106';
+    let currentAdminName = 'Rizky';
 
     // Show modal when form is submitted
     form.addEventListener('submit', function(e) {
@@ -556,13 +661,13 @@
       const username = document.getElementById('username').value;
       const produk = document.getElementById('produk').value;
       const metode = document.getElementById('metode').value;
-      const hasil = `Terima kasih ${username}, pembelian ${produk} via ${metode} sedang diproses!`;
+      const edition = document.getElementById('edition').value;
+      const hasil = `Terima kasih ${username} (${edition}), pembelian ${produk} via ${metode} sedang diproses oleh ${currentAdminName}!`;
       document.getElementById('hasilTransaksi').textContent = hasil;
 
       // Redirect to WhatsApp with personalized message
-      const message = `Halo min saya ${username} mau beli ${produk}`;
-      const phoneNumber = '6285720103106';
-      const whatsappUrl = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`;
+      const message = `Halo min saya ${username} (${edition}) mau beli ${produk}`;
+      const whatsappUrl = `https://wa.me/${currentWhatsAppNumber}?text=${encodeURIComponent(message)}`;
       window.location.href = whatsappUrl;
     });
 
@@ -576,6 +681,27 @@
       if (e.target === modal) {
         modal.style.display = 'none';
       }
+    });
+
+    // Minecraft Edition Selection
+    const editionOptions = document.querySelectorAll('.edition-option');
+    editionOptions.forEach(option => {
+      option.addEventListener('click', function() {
+        editionOptions.forEach(opt => opt.classList.remove('selected'));
+        this.classList.add('selected');
+        document.getElementById('edition').value = this.dataset.edition;
+      });
+    });
+
+    // WhatsApp Number Selection
+    const whatsappOptions = document.querySelectorAll('.whatsapp-option');
+    whatsappOptions.forEach(option => {
+      option.addEventListener('click', function() {
+        whatsappOptions.forEach(opt => opt.classList.remove('selected'));
+        this.classList.add('selected');
+        currentWhatsAppNumber = this.dataset.number;
+        currentAdminName = this.dataset.name;
+      });
     });
 
     // Update Minecraft head when username changes
@@ -611,39 +737,4 @@
     });
 
     // Create floating particles
-    function createParticles() {
-      const particlesContainer = document.getElementById('particles');
-      const particleCount = 50;
-      
-      for (let i = 0; i < particleCount; i++) {
-        const particle = document.createElement('div');
-        particle.classList.add('particle');
-        
-        // Random end position towards center (blackhole)
-        const angle = Math.random() * Math.PI * 2;
-        const distance = 50 + Math.random() * 100;
-        const tx = Math.cos(angle) * distance;
-        const ty = Math.sin(angle) * distance;
-        
-        particle.style.setProperty('--tx', `${tx}px`);
-        particle.style.setProperty('--ty', `${ty}px`);
-        
-        const size = Math.random() * 4 + 1;
-        particle.style.width = `${size}px`;
-        particle.style.height = `${size}px`;
-        particle.style.left = `${Math.random() * 100}%`;
-        particle.style.top = `${Math.random() * 100}%`;
-        particle.style.animationDuration = `${Math.random() * 10 + 5}s`;
-        particle.style.animationDelay = `${Math.random() * 5}s`;
-        
-        particlesContainer.appendChild(particle);
-      }
-    }
-
-    // Initialize effects when page loads
-    window.addEventListener('load', function() {
-      createParticles();
-    });
-  </script>
-</body>
-</html>
+    function 
